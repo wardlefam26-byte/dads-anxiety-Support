@@ -1,55 +1,177 @@
--- Dad's Anxiety Support System v1
-PRAGMA foreign_keys = ON;
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#264653">
+  <title>Dad's Anxiety Support</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header><h1>Dad's Anxiety Support</h1></header>
 
-CREATE TABLE IF NOT EXISTS categories (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  name TEXT NOT NULL UNIQUE COLLATE NOCASE,
-  is_active INTEGER NOT NULL DEFAULT 1 CHECK (is_active IN (0,1)),
-  created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
-);
+<main class="wrap">
+  <section id="loginView" class="card narrow">
+    <h2>Family Access</h2>
+    <p class="muted">Enter the family PIN to open the support system.</p>
+    <label for="pin">Family PIN</label>
+    <input id="pin" type="password" inputmode="numeric" autocomplete="current-password">
+    <button class="primary" id="loginButton">Open App</button>
+    <div id="loginMessage"></div>
+  </section>
 
-CREATE TABLE IF NOT EXISTS observations (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  event_date TEXT NOT NULL,
-  observer TEXT,
-  category_id INTEGER NOT NULL,
-  trigger_text TEXT NOT NULL,
-  worry_text TEXT NOT NULL,
-  suds INTEGER NOT NULL CHECK (suds BETWEEN 0 AND 10),
-  dad_responses TEXT NOT NULL DEFAULT '[]',
-  family_responses TEXT NOT NULL DEFAULT '[]',
-  duration TEXT,
-  reassurance TEXT,
-  progress_text TEXT,
-  notes TEXT,
-  FOREIGN KEY (category_id) REFERENCES categories(id)
-);
+  <section id="homeView" class="view hidden">
+    <div class="card action-grid">
+      <button class="primary big" data-open="triggerView">＋ Record Trigger</button>
+      <button class="gold big" data-open="winView">★ Record a Win</button>
+      <button class="outline" data-open="dashboardView">View Dashboard</button>
+      <button class="outline" data-open="timelineView">Recent Timeline</button>
+      <button class="outline" data-open="guideView">Family Guide</button>
+      <button class="outline" data-open="categoryView">Add Trigger Category</button>
+    </div>
+  </section>
 
-CREATE TABLE IF NOT EXISTS wins (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  event_date TEXT NOT NULL,
-  observer TEXT,
-  win_text TEXT NOT NULL,
-  category_id INTEGER,
-  FOREIGN KEY (category_id) REFERENCES categories(id)
-);
+  <section id="triggerView" class="view hidden">
+    <form id="triggerForm" class="card">
+      <h2>Record Trigger</h2>
+      <div id="triggerMessage"></div>
 
-CREATE INDEX IF NOT EXISTS idx_observations_event_date ON observations(event_date);
-CREATE INDEX IF NOT EXISTS idx_observations_category_id ON observations(category_id);
-CREATE INDEX IF NOT EXISTS idx_wins_event_date ON wins(event_date);
+      <div class="two">
+        <div><label for="eventDate">Date</label><input id="eventDate" type="date" required></div>
+        <div><label for="observer">Observer initials <span>(optional)</span></label><input id="observer" maxlength="50"></div>
+      </div>
 
-INSERT OR IGNORE INTO categories (name) VALUES
-('Leaving home'),
-('Car ride / travel'),
-('Health concern'),
-('Appointment'),
-('Crowd or public place'),
-('Church or family event'),
-('Change in plans'),
-('Decision or uncertainty'),
-('Being alone'),
-('Weather or safety'),
-('Medication or medical care'),
-('Other');
+      <label for="category">Trigger category</label>
+      <select id="category" required></select>
+
+      <label for="trigger">What happened?</label>
+      <textarea id="trigger" required placeholder="Briefly describe the situation"></textarea>
+
+      <label for="worry">What was Dad worried might happen?</label>
+      <textarea id="worry" required placeholder="Use Dad's words when possible"></textarea>
+
+      <label>Peak SUDS: 0–10</label>
+      <div id="sudsOptions" class="suds"></div>
+
+      <label>What did Dad do?</label>
+      <div id="dadOptions" class="chips"></div>
+
+      <label>How did the family respond?</label>
+      <div id="familyOptions" class="chips"></div>
+
+      <div class="two">
+        <div>
+          <label for="duration">Approximate duration</label>
+          <select id="duration">
+            <option value="">Choose…</option>
+            <option>Less than 5 minutes</option>
+            <option>5–15 minutes</option>
+            <option>16–30 minutes</option>
+            <option>31–60 minutes</option>
+            <option>1–2 hours</option>
+            <option>More than 2 hours</option>
+            <option>Unknown</option>
+          </select>
+        </div>
+        <div>
+          <label for="reassurance">Repeated reassurance?</label>
+          <select id="reassurance">
+            <option value="">Choose…</option>
+            <option>No</option>
+            <option>Once only</option>
+            <option>Yes, repeatedly</option>
+            <option>Unknown</option>
+          </select>
+        </div>
+      </div>
+
+      <label for="progress">Progress noticed <span>(optional)</span></label>
+      <input id="progress" maxlength="500" placeholder="Stayed longer, asked fewer times, etc.">
+
+      <label for="notes">Notes <span>(optional)</span></label>
+      <textarea id="notes" maxlength="1500"></textarea>
+
+      <button class="primary" type="submit">Save Observation</button>
+      <button class="outline" type="button" data-open="homeView">Cancel</button>
+    </form>
+  </section>
+
+  <section id="winView" class="view hidden">
+    <form id="winForm" class="card">
+      <h2>Record a Win</h2>
+      <div id="winMessage"></div>
+      <div class="two">
+        <div><label for="winDate">Date</label><input id="winDate" type="date" required></div>
+        <div><label for="winObserver">Entered by <span>(optional)</span></label><input id="winObserver" maxlength="50"></div>
+      </div>
+      <label for="winText">What progress happened?</label>
+      <textarea id="winText" required placeholder="Example: Dad stayed through the whole meeting."></textarea>
+      <label for="winCategory">Related category <span>(optional)</span></label>
+      <select id="winCategory"></select>
+      <button class="gold" type="submit">Save Win</button>
+      <button class="outline" type="button" data-open="homeView">Cancel</button>
+    </form>
+  </section>
+
+  <section id="categoryView" class="view hidden">
+    <form id="categoryForm" class="card">
+      <h2>Add Trigger Category</h2>
+      <div id="categoryMessage"></div>
+      <label for="newCategory">New category</label>
+      <input id="newCategory" maxlength="80" required placeholder="Example: Unexpected visitors">
+      <button class="primary" type="submit">Add Category</button>
+      <button class="outline" type="button" data-open="homeView">Back</button>
+    </form>
+  </section>
+
+  <section id="dashboardView" class="view hidden">
+    <div class="card">
+      <h2>This Week</h2>
+      <div class="stats">
+        <div class="stat"><strong id="dCount">0</strong><span>Observations</span></div>
+        <div class="stat"><strong id="dSuds">—</strong><span>Average SUDS</span></div>
+        <div class="stat"><strong id="dTop">—</strong><span>Top Trigger</span></div>
+        <div class="stat"><strong id="dReassure">—</strong><span>Repeated Reassurance</span></div>
+        <div class="stat"><strong id="dProgress">0</strong><span>Progress Notes</span></div>
+        <div class="stat"><strong id="dWins">0</strong><span>Wins</span></div>
+      </div>
+      <h3>Weekly Summary</h3>
+      <p id="dSummary"></p>
+      <button class="outline" type="button" data-open="homeView">Back</button>
+    </div>
+  </section>
+
+  <section id="timelineView" class="view hidden">
+    <div class="card">
+      <h2>Recent Timeline</h2>
+      <div id="timeline"></div>
+      <button class="outline" type="button" data-open="homeView">Back</button>
+    </div>
+  </section>
+
+  <section id="guideView" class="view hidden">
+    <div class="card">
+      <h2>Family Guide</h2>
+      <div class="guide-good">
+        <h3>Helpful language</h3>
+        <p>“I can see this is really hard.”</p>
+        <p>“I'm here with you while this feeling passes.”</p>
+        <p>“We don't have to solve that uncertainty right now.”</p>
+        <p>“You stayed with something difficult.”</p>
+      </div>
+      <div class="guide-avoid">
+        <h3>Try to avoid</h3>
+        <p>“I promise nothing bad will happen.”</p>
+        <p>“Everything will definitely be fine.”</p>
+        <p>Repeatedly answering the same reassurance question.</p>
+        <p>Surprising, forcing, or arguing Dad into a feared situation.</p>
+      </div>
+      <p class="muted">Support Dad, not the anxiety. This app is not a diagnosis or emergency service.</p>
+      <button class="outline" type="button" data-open="homeView">Back</button>
+    </div>
+  </section>
+</main>
+
+<script src="app.js"></script>
+</body>
+</html>
