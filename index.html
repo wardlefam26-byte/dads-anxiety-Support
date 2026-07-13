@@ -26,6 +26,7 @@
       <button class="gold big" data-open="winView">★ Record a Win</button>
       <button class="outline" data-open="dashboardView">View Dashboard</button>
       <button class="outline" data-open="timelineView">Recent Timeline</button>
+      <button class="outline" data-open="dataLogView">Data Log & Export</button>
       <button class="outline" data-open="guideView">Family Guide</button>
       <button class="outline" data-open="categoryView">Add Trigger Category</button>
     </div>
@@ -145,6 +146,30 @@
     <div class="card">
       <h2>Recent Timeline</h2>
       <div id="timeline"></div>
+      <button class="outline" type="button" data-open="homeView">Back</button>
+    </div>
+  </section>
+
+
+  <section id="dataLogView" class="view hidden">
+    <div class="card">
+      <h2>Data Log</h2>
+      <p class="muted">Filter recorded triggers and wins. This view is read-only.</p>
+      <div class="filter-grid">
+        <div><label for="logType">Record type</label><select id="logType"><option value="all">Triggers and wins</option><option value="trigger">Triggers only</option><option value="win">Wins only</option></select></div>
+        <div><label for="logCategory">Category</label><select id="logCategory"><option value="">All categories</option></select></div>
+        <div><label for="logDateFrom">From date</label><input id="logDateFrom" type="date"></div>
+        <div><label for="logDateTo">To date</label><input id="logDateTo" type="date"></div>
+        <div><label for="logSudsMin">Minimum SUDS</label><select id="logSudsMin"><option value="">Any</option><option>0</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option></select></div>
+        <div><label for="logSudsMax">Maximum SUDS</label><select id="logSudsMax"><option value="">Any</option><option>0</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option></select></div>
+      </div>
+      <div class="button-row">
+        <button class="primary" type="button" id="applyLogFilters">Apply Filters</button>
+        <button class="outline" type="button" id="clearLogFilters">Clear</button>
+        <button class="gold" type="button" id="exportLogCsv">Export CSV</button>
+      </div>
+      <div id="dataLogMessage"></div>
+      <div id="dataLog"></div>
       <button class="outline" type="button" data-open="homeView">Back</button>
     </div>
   </section>
