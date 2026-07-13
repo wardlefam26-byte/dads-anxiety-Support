@@ -1,24 +1,55 @@
-<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Dad's Anxiety Support</title><style>
-body{font-family:Arial;margin:0;background:#eef4f3;color:#243238}header{background:#264653;color:white;padding:18px;text-align:center}.wrap{max-width:720px;margin:auto;padding:14px}.card{background:white;border-radius:16px;padding:16px;margin-bottom:14px;box-shadow:0 2px 10px #0002}.hidden{display:none}button{width:100%;padding:14px;border:0;border-radius:12px;font-weight:bold;font-size:16px;margin:5px 0}.primary{background:#2a9d8f;color:white}.secondary{background:#e9c46a}.outline{background:white;border:2px solid #264653;color:#264653}input,select,textarea{width:100%;padding:12px;border:1px solid #ccd;border-radius:10px;font-size:16px;box-sizing:border-box}label{display:block;font-weight:bold;margin:14px 0 6px}textarea{min-height:75px}.chips{display:flex;flex-wrap:wrap;gap:7px}.chip input{display:none}.chip span{display:inline-block;padding:9px 11px;border-radius:999px;background:#edf1f2;border:1px solid #d8e0e2}.chip input:checked+span{background:#2a9d8f;color:white}.suds{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}.suds input{display:none}.suds span{display:flex;height:42px;align-items:center;justify-content:center;background:#edf1f2;border-radius:10px;font-weight:bold}.suds input:checked+span{background:#e76f51;color:white}.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px}.stat{background:#f7f3e8;padding:12px;border-radius:12px;text-align:center}.stat strong{display:block;font-size:22px}.msg{padding:10px;border-radius:8px;margin:8px 0}.ok{background:#e5f5ec}.bad{background:#fdeaea}
-</style></head><body><header><b>Dad's Anxiety Support System</b></header><div class="wrap">
-<section id="login" class="card"><h2>Family Access</h2><label>Family PIN</label><input id="pin" type="password"><button class="primary" onclick="login()">Open App</button><div id="loginMsg"></div></section>
-<section id="home" class="hidden"><div class="card"><button class="primary" onclick="show('obs')">＋ Record Trigger</button><button class="secondary" onclick="show('win')">★ Record a Win</button><button class="outline" onclick="show('dash');dashboard()">View Dashboard</button><button class="outline" onclick="show('cat')">Add Trigger Category</button></div></section>
-<section id="obs" class="hidden"><div class="card"><h2>Record Trigger</h2><div id="obsMsg"></div><label>Date</label><input id="date" type="date"><label>Observer initials</label><input id="observer"><label>Trigger category</label><select id="category"></select><label>What happened?</label><textarea id="trigger"></textarea><label>Dad's worry</label><textarea id="worry"></textarea><label>Peak SUDS</label><div class="suds" id="suds"></div><label>What did Dad do?</label><div id="dad" class="chips"></div><label>How did family respond?</label><div id="family" class="chips"></div><label>Duration</label><select id="duration"><option value="">Choose…</option><option>Less than 5 minutes</option><option>5–15 minutes</option><option>16–30 minutes</option><option>31–60 minutes</option><option>1–2 hours</option><option>More than 2 hours</option><option>Unknown</option></select><label>Repeated reassurance?</label><select id="reassurance"><option value="">Choose…</option><option>No</option><option>Once only</option><option>Yes, repeatedly</option><option>Unknown</option></select><label>Progress noticed</label><input id="progress"><label>Notes</label><textarea id="notes"></textarea><button class="primary" onclick="saveObservation()">Save Observation</button><button class="outline" onclick="show('home')">Cancel</button></div></section>
-<section id="win" class="hidden"><div class="card"><h2>Record a Win</h2><div id="winMsg"></div><label>Date</label><input id="winDate" type="date"><label>Entered by</label><input id="winObserver"><label>Win or progress</label><textarea id="winText"></textarea><label>Related category</label><select id="winCategory"></select><button class="secondary" onclick="saveWin()">Save Win</button><button class="outline" onclick="show('home')">Cancel</button></div></section>
-<section id="cat" class="hidden"><div class="card"><h2>Add Trigger Category</h2><div id="catMsg"></div><input id="newCategory"><button class="primary" onclick="addCategory()">Add</button><button class="outline" onclick="show('home')">Back</button></div></section>
-<section id="dash" class="hidden"><div class="card"><h2>This Week</h2><div class="stats"><div class="stat"><strong id="dc">0</strong>Observations</div><div class="stat"><strong id="ds">—</strong>Average SUDS</div><div class="stat"><strong id="dt">—</strong>Top Trigger</div><div class="stat"><strong id="dr">—</strong>Repeated Reassurance</div><div class="stat"><strong id="dp">0</strong>Progress Notes</div><div class="stat"><strong id="dw">0</strong>Total Wins</div></div><p id="summary"></p><button class="outline" onclick="show('home')">Back</button></div></section>
-</div><script>
-const API_URL='https://script.google.com/macros/s/AKfycbysK0nR8uID59kikuJhZBr1G4xMYQW9Wwv0lEi7ZGH5hdWlri15tP6581n4j6bCY2549Q/exec';let PIN='',cats=[];
-const dadOpts=['Asked for reassurance','Repeated the same question','Checked something','Avoided or delayed','Wanted to leave','Stayed with the situation','Other / unsure'];const famOpts=['Validated feelings','Stayed calm','Gave reassurance once','Repeatedly reassured','Redirected to uncertainty','Encouraged a small step','Changed plans','Gave space','Other / unsure'];
-for(let i=0;i<=10;i++)suds.innerHTML+=`<label><input type="radio" name="suds" value="${i}"><span>${i}</span></label>`;function chips(id,arr,name){document.getElementById(id).innerHTML=arr.map(x=>`<label class="chip"><input type="checkbox" name="${name}" value="${x}"><span>${x}</span></label>`).join('')}chips('dad',dadOpts,'dadResponse');chips('family',famOpts,'familyResponse');
-function show(id){['login','home','obs','win','cat','dash'].forEach(x=>document.getElementById(x).classList.toggle('hidden',x!==id));scrollTo(0,0)}
-function jsonp(action,cb){const n='cb'+Date.now();window[n]=d=>{cb(d);delete window[n];s.remove()};const s=document.createElement('script');s.src=API_URL+'?action='+action+'&pin='+encodeURIComponent(PIN)+'&callback='+n;s.onerror=()=>cb({ok:false,error:'Could not reach data service.'});document.body.appendChild(s)}
-function login(){PIN=pin.value.trim();jsonp('initial',d=>{if(!d.ok){message('loginMsg',d.error,false);return}cats=d.categories||[];setCats();date.value=d.today;winDate.value=d.today;update(d.dashboard);show('home')})}
-function setCats(){category.innerHTML='<option value="">Choose…</option>'+cats.map(x=>`<option>${x}</option>`).join('');winCategory.innerHTML='<option value="">None</option>'+cats.map(x=>`<option>${x}</option>`).join('')}
-async function post(o){o.pin=PIN;await fetch(API_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:new URLSearchParams(o)})}
-function checked(n){return [...document.querySelectorAll(`input[name="${n}"]:checked`)].map(x=>x.value).join(', ')}
-async function saveObservation(){const s=document.querySelector('input[name="suds"]:checked');const o={action:'saveObservation',eventDate:date.value,observer:observer.value,category:category.value,trigger:trigger.value,worry:worry.value,suds:s?s.value:'',dadResponse:checked('dadResponse'),familyResponse:checked('familyResponse'),duration:duration.value,reassurance:reassurance.value,progress:progress.value,notes:notes.value};if(!o.eventDate||!o.category||!o.trigger||!o.worry||o.suds===''){message('obsMsg','Complete date, category, trigger, worry, and SUDS.',false);return}await post(o);message('obsMsg','Observation submitted.',true);setTimeout(()=>show('home'),700)}
-async function saveWin(){if(!winDate.value||!winText.value){message('winMsg','Enter a date and win.',false);return}await post({action:'saveWin',eventDate:winDate.value,observer:winObserver.value,win:winText.value,category:winCategory.value});message('winMsg','Win submitted.',true);setTimeout(()=>show('home'),700)}
-async function addCategory(){if(!newCategory.value){message('catMsg','Type a category.',false);return}await post({action:'addCategory',category:newCategory.value});message('catMsg','Category submitted. Refresh the page to see it.',true)}
-function dashboard(){jsonp('dashboard',d=>{if(d.ok)update(d.dashboard)})}function update(d){if(!d)return;dc.textContent=d.observationsThisWeek;ds.textContent=d.averageSuds??'—';dt.textContent=d.topTrigger;dr.textContent=d.repeatedReassuranceRate==null?'—':d.repeatedReassuranceRate+'%';dp.textContent=d.progressEntriesThisWeek;dw.textContent=d.totalWins;summary.textContent=d.summary}function message(id,t,ok){document.getElementById(id).innerHTML=`<div class="msg ${ok?'ok':'bad'}">${t}</div>`}
-</script></body></html>
+-- Dad's Anxiety Support System v1
+PRAGMA foreign_keys = ON;
+
+CREATE TABLE IF NOT EXISTS categories (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  name TEXT NOT NULL UNIQUE COLLATE NOCASE,
+  is_active INTEGER NOT NULL DEFAULT 1 CHECK (is_active IN (0,1)),
+  created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS observations (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  event_date TEXT NOT NULL,
+  observer TEXT,
+  category_id INTEGER NOT NULL,
+  trigger_text TEXT NOT NULL,
+  worry_text TEXT NOT NULL,
+  suds INTEGER NOT NULL CHECK (suds BETWEEN 0 AND 10),
+  dad_responses TEXT NOT NULL DEFAULT '[]',
+  family_responses TEXT NOT NULL DEFAULT '[]',
+  duration TEXT,
+  reassurance TEXT,
+  progress_text TEXT,
+  notes TEXT,
+  FOREIGN KEY (category_id) REFERENCES categories(id)
+);
+
+CREATE TABLE IF NOT EXISTS wins (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  event_date TEXT NOT NULL,
+  observer TEXT,
+  win_text TEXT NOT NULL,
+  category_id INTEGER,
+  FOREIGN KEY (category_id) REFERENCES categories(id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_observations_event_date ON observations(event_date);
+CREATE INDEX IF NOT EXISTS idx_observations_category_id ON observations(category_id);
+CREATE INDEX IF NOT EXISTS idx_wins_event_date ON wins(event_date);
+
+INSERT OR IGNORE INTO categories (name) VALUES
+('Leaving home'),
+('Car ride / travel'),
+('Health concern'),
+('Appointment'),
+('Crowd or public place'),
+('Church or family event'),
+('Change in plans'),
+('Decision or uncertainty'),
+('Being alone'),
+('Weather or safety'),
+('Medication or medical care'),
+('Other');
