@@ -1,4 +1,4 @@
-const API_URL = "PASTE_YOUR_CLOUDFLARE_WORKER_URL_HERE";
+const API_URL = "https://wardlefam26-byte.github.io/dads-anxiety-Support/?v=11";
 
 const dadResponseChoices = [
   "Asked for reassurance","Repeated the same question","Checked something",
