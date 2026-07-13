@@ -1,4 +1,4 @@
-const API_URL = "https://wardlefam26-byte.github.io/dads-anxiety-Support/?v=11";
+const API_URL = "https://dads-anxeity-support.wardlefam26.workers.dev";
 
 const dadResponseChoices = [
   "Asked for reassurance","Repeated the same question","Checked something",
